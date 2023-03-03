@@ -10,8 +10,10 @@ namespace WinFormsApp1
     {
         public string Nome { get; set; }
         public string Cognome { get; set; }
-        public DateOnly DataNascita { get; set; }
+        public DateTime DataNascita { get; set; }
         public string Sesso { get; set; }
+        public string CodiceComune { get; set; }
+
         public Persona() { }
 
     }

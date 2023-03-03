@@ -2,7 +2,7 @@ namespace WinFormsApp1
 {
     public partial class Form1 : Form
     {
-        private string pathComuni = "C:\\Users\\emanuela.mascolo\\Desktop\\Academy\\1. esercizi\\WinFormsApp1\\WinFormsApp1\\ElencoComuni.csv";
+        private string pathComuni = "C:\\Users\\emanuela.mascolo\\source\\repos\\NewRepo\\WinFormsApp1\\WinFormsApp1\\ElencoComuni.csv";
         private Dictionary<string, string> Comuni = new Dictionary<string, string>();
 
         Persona p = new Persona();
@@ -22,48 +22,58 @@ namespace WinFormsApp1
                 while (!sr.EndOfStream)
                 {
                     string[] comune = sr.ReadLine().Split(',');
-                    comboBoxComune.Items.Add(comune[0]);
-                    Comuni.Add(comune[1], comune[0]);   //codice, nome
+                    comboBoxComune.Items.Add(comune[0]);    //nome
+                    Comuni.Add(comune[0], comune[1]);   //nome, codice
                 }
             }
+
+            //var allLines = File.ReadAllLines(pathComuni);
+
+
         }
 
         private void buttonCF_Click(object sender, EventArgs e)
         {
-            ControlloDati();
+            if (!ControlloDati())
+            {
+                return;
+            }
+            else
+            {
+                var cf = new Tecnosoftware.CodiceFiscale.CodiceFiscale(p.Cognome, p.Nome, p.DataNascita, p.CodiceComune, p.Sesso);
+                MessageBox.Show(cf.estraiCF());
+            }
+
         }
 
-        private void ControlloDati()
+        private bool ControlloDati()
         {
             string nome = textBoxNome.Text.ToUpper();
             string cognome = textBoxCognome.Text.ToUpper();
             if (string.IsNullOrEmpty(nome) || string.IsNullOrEmpty(cognome))
             {
                 MessageBox.Show("inserire nome/cognome");  //msg di errore!
-                return;
+                return false;
             }
-            DateOnly data = new DateOnly();
-            if(!DateOnly.TryParse(dataNascitaPicker.Value.ToShortDateString(), out data))
+            DateTime data = new DateTime();
+            if(!DateTime.TryParse(dataNascitaPicker.Value.ToShortDateString(), out data))
             {
                 MessageBox.Show("selezionare una data valida");  //msg di errore!
-                return;
+                return false;
             }
             string comune = comboBoxComune.Text;
             if (!comboBoxComune.Items.Contains(comune))
             {
                 MessageBox.Show("selezionare un comune");  //msg di errore!
-                return;
+                return false;
             }
-            string maschio = radioButtonM.Text;
-            string femmina = radioButtonF.Text;
-            if(string.IsNullOrEmpty(maschio) || string.IsNullOrEmpty(femmina))
-            {
-                MessageBox.Show("selezionare il genere");
-                return;
-            }
+            string codiceComune = Comuni[comune];       //nome è la chiave
+            
+            string sex = radioButtonF.Checked ? "F" : "M";
+            
 
-            p = new Persona() { Nome = nome, Cognome = cognome, DataNascita = data};
-
+            p = new Persona() { Nome = nome, Cognome = cognome, Sesso = sex, DataNascita = data, CodiceComune = codiceComune };
+            return true;
             
         }
     }
